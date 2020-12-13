@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <stack>
 #include <queue>
+#include <chrono>
 
 int main(int argc, char* argv[])
 {
@@ -34,6 +34,8 @@ int main(int argc, char* argv[])
         return 1;
     }
     
+    auto start = std::chrono::high_resolution_clock::now();
+
     // Get all lines from file and set them up into a vector
     char buf[256];
     std::vector<std::string> filestrings;
@@ -61,9 +63,9 @@ int main(int argc, char* argv[])
             tokenstack.push(temppair);
             continue;
         }
-        if (i == 12)
+        if (i == 24)
         {
-            //std::cout << "TESTTESTESTEST" << std::endl;
+           //std::cout << "TESTTESTESTEST" << std::endl;
         }
 
         bool hitfirstinfo = false;
@@ -113,6 +115,7 @@ int main(int argc, char* argv[])
                         temppair->second = currentstring;
                         tokenstack.push(temppair);
                         currentstring = "";
+                        addedkey = true;
                         break;
                     }
                     break;
@@ -212,13 +215,15 @@ int main(int argc, char* argv[])
                         temppair = new std::pair<enum KVToken, std::string>;
                         if (addedkey)
                         {
-                            temppair->first = T_KeyValue;
+                            if (commentmode) temppair->first = T_CommentInline;
+                            else temppair->first = T_KeyValue;
                             temppair->second = currentstring;
                             tokenstack.push(temppair);                     
                         }
                         else
                         {
-                            temppair->first = T_ObjectHeader;
+                            if (commentmode) temppair->first = T_CommentOwnline;
+                            else temppair->first = T_ObjectHeader;
                             temppair->second = currentstring;
                             tokenstack.push(temppair);
                         }
@@ -237,6 +242,10 @@ int main(int argc, char* argv[])
         {
             case T_CommentInline:
                 std::cout << " " << tpair->second << std::endl;
+                break;
+            case T_CommentOwnline:
+                for (int i = 0; i < indentationlevel; i++) std::cout << "\t";
+                std::cout << tpair->second << std::endl;
                 break;
             case T_ObjectStart:
                 for (int i = 0; i < indentationlevel; i++) std::cout << "\t";
@@ -264,4 +273,22 @@ int main(int argc, char* argv[])
         if (tokenstack.front()->first == T_KeyValue) continue;
         std::cout << std::endl;
     }
+
+    auto stop = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "\nEXECUTION TIME: " << duration.count() << std::endl;
 }
+
+// Original Algorithm timing (Release x64):
+// Test 1:  19136
+// Test 2:  21752
+// Test 3:  21616
+// Test 4:  20043
+// Test 5:  19273
+// Test 6:  20912
+// Test 7:  20210
+// Test 8:  21405
+// Test 9:  21110
+// Test 10: 20899
+// Average: 20635.5
