@@ -3,7 +3,7 @@
 #include <queue>
 #include <string>
 
-class KeyValues
+class KeyValuesQueue
 {
 public:
 	enum KVToken
@@ -13,10 +13,10 @@ public:
     };
 
 public:
-    friend std::ostream& operator<<(std::ostream& os, const KeyValues& obj);
+    friend std::ostream& operator<<(std::ostream& os, const KeyValuesQueue& obj);
     void PushTokenQueue(std::pair<KVToken, std::string>* newtokenpair);
     int GetQueueSize();
-    std::pair<enum KeyValues::KVToken, std::string>* GetFrontValueOfQueue();
+    std::pair<enum KeyValuesQueue::KVToken, std::string>* GetFrontValueOfQueue();
     void PopQueue();
 
 private:

@@ -35,19 +35,19 @@ int main(int argc, char* argv[])
     }
     myfile.close();
 
-    KeyValues *kvstorage = new KeyValues();
+    KeyValuesQueue *kvstorage = new KeyValuesQueue();
 
     // Iterate through the vector, then parse every string and put its information on the stack
     for (int i = 0; i < filestrings.size(); i++)
     {
         std::string currentstring = "";
-        std::pair<enum KeyValues::KVToken, std::string>* temppair;
+        std::pair<enum KeyValuesQueue::KVToken, std::string>* temppair;
 
         std::string thisline = filestrings.at(i);
         if (thisline == "")
         {
-            temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-            temppair->first = KeyValues::KVToken::T_EmptyLine;
+            temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+            temppair->first = KeyValuesQueue::KVToken::T_EmptyLine;
             temppair->second = "";
             kvstorage->PushTokenQueue(temppair);
             continue;
@@ -75,9 +75,9 @@ int main(int argc, char* argv[])
                     if (j + 1 == thisline.size())
                     {
                         if (currentstring == "") break;
-                        temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                        if (addedkey) temppair->first = KeyValues::KVToken::T_KeyValue;
-                        else          temppair->first = KeyValues::KVToken::T_ObjectHeader;
+                        temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                        if (addedkey) temppair->first = KeyValuesQueue::KVToken::T_KeyValue;
+                        else          temppair->first = KeyValuesQueue::KVToken::T_ObjectHeader;
                         temppair->second = currentstring;
                         kvstorage->PushTokenQueue(temppair);
                         currentstring = "";
@@ -85,8 +85,8 @@ int main(int argc, char* argv[])
                     }
                     if (thisline.at(j + 1) == ' ' || thisline.at(j + 1) == '\t')
                     {
-                        temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                        temppair->first = KeyValues::KVToken::T_KeyName;
+                        temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                        temppair->first = KeyValuesQueue::KVToken::T_KeyName;
                         temppair->second = currentstring;
                         kvstorage->PushTokenQueue(temppair);
                         currentstring = "";
@@ -106,18 +106,18 @@ int main(int argc, char* argv[])
                     if (j + 1 == thisline.size())
                     {
                         if (currentstring == "") break;
-                        temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                        if (addedkey) temppair->first = KeyValues::KVToken::T_KeyValue;
-                        else          temppair->first = KeyValues::KVToken::T_ObjectHeader;
+                        temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                        if (addedkey) temppair->first = KeyValuesQueue::KVToken::T_KeyValue;
+                        else          temppair->first = KeyValuesQueue::KVToken::T_ObjectHeader;
                         temppair->second = currentstring;
                         kvstorage->PushTokenQueue(temppair);
                     }
                     if (!hitfirstinfo) break;
                     if (inside_quotes) break;
                     if (currentstring == "") break;
-                    temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                    if (!addedkey) temppair->first = KeyValues::KVToken::T_KeyName;
-                    else temppair->first = KeyValues::KVToken::T_KeyValue;
+                    temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                    if (!addedkey) temppair->first = KeyValuesQueue::KVToken::T_KeyName;
+                    else temppair->first = KeyValuesQueue::KVToken::T_KeyValue;
                     temppair->second = currentstring;
                     kvstorage->PushTokenQueue(temppair);
                     addedkey = true;
@@ -127,15 +127,15 @@ int main(int argc, char* argv[])
                 // Take note of { and }
                 case '{':
                     hitfirstinfo = true;
-                    temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                    temppair->first = KeyValues::KVToken::T_ObjectStart;
+                    temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                    temppair->first = KeyValuesQueue::KVToken::T_ObjectStart;
                     temppair->second = "{";
                     kvstorage->PushTokenQueue(temppair);
                     break;
                 case '}':
                     hitfirstinfo = true;
-                    temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                    temppair->first = KeyValues::KVToken::T_ObjectEnd;
+                    temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                    temppair->first = KeyValuesQueue::KVToken::T_ObjectEnd;
                     temppair->second = "}";
                     kvstorage->PushTokenQueue(temppair);
                     break;
@@ -154,9 +154,9 @@ int main(int argc, char* argv[])
                         if (j + 1 == thisline.size())
                         {
                             if (currentstring == "") break;
-                            temppair = new std::pair<enum KeyValues::KVToken, std::string>;
-                            if (addedkey) temppair->first = KeyValues::KVToken::T_CommentInline;
-                            else temppair->first = KeyValues::KVToken::T_CommentOwnline;                              
+                            temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
+                            if (addedkey) temppair->first = KeyValuesQueue::KVToken::T_CommentInline;
+                            else temppair->first = KeyValuesQueue::KVToken::T_CommentOwnline;
                             temppair->second = currentstring;
                             kvstorage->PushTokenQueue(temppair);
                         }
@@ -171,16 +171,16 @@ int main(int argc, char* argv[])
                     currentstring.push_back(thisline.at(j));
                     if (j + 1 == thisline.size())
                     {
-                        temppair = new std::pair<enum KeyValues::KVToken, std::string>;
+                        temppair = new std::pair<enum KeyValuesQueue::KVToken, std::string>;
                         if (addedkey)
                         {
-                            if (commentmode) temppair->first = KeyValues::KVToken::T_CommentInline;
-                            else temppair->first = KeyValues::KVToken::T_KeyValue;
+                            if (commentmode) temppair->first = KeyValuesQueue::KVToken::T_CommentInline;
+                            else temppair->first = KeyValuesQueue::KVToken::T_KeyValue;
                         }
                         else
                         {
-                            if (commentmode) temppair->first = KeyValues::KVToken::T_CommentOwnline;
-                            else temppair->first = KeyValues::KVToken::T_ObjectHeader;
+                            if (commentmode) temppair->first = KeyValuesQueue::KVToken::T_CommentOwnline;
+                            else temppair->first = KeyValuesQueue::KVToken::T_ObjectHeader;
                         }
                         temppair->second = currentstring;
                         kvstorage->PushTokenQueue(temppair);
