@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="KeyValues.cpp" />
     <ClCompile Include="ValveKVParser.cpp" />
   </ItemGroup>
   <ItemGroup>
